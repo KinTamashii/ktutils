@@ -173,20 +173,20 @@ namespace ktu {
         value_type value = 0;
         if constexpr (sizeof(value_type) == 1) {
             if constexpr (N > 0) {
-                value = str[0];
+                value = str[0] & 0xFF;
             }
         } else if constexpr (std::endian::native == std::endian::big) {
             const char *ptr = &str[0];
             for (int i = 0; i < N; i++) {
                 value <<= 8;
-                value |= *ptr;
+                value |= *ptr & 0xFF;
                 if (i < N - 1) ptr++;
             }
         } else if constexpr (std::endian::native == std::endian::little) {
             const char *ptr = &str[N-1];
             for (int i = 0; i < N; i++) {
                 value <<= 8;
-                value |= *ptr;
+                value |= *ptr & 0xFF;
                 if (i < N - 1) ptr--;
             }
         }
@@ -203,7 +203,7 @@ namespace ktu {
 
     template <std::integral T>
     inline constexpr int highest_bit (T value) {
-        return sizeof(value)*8 - 1 - (std::countl_zero(static_cast<typename std::make_unsigned<T>::type>(value)) * !!value);
+        return value ? (int)(sizeof(value)*8 - 1 - (std::countl_zero(static_cast<typename std::make_unsigned<T>::type>(value)))) : -1;
     }
     
 

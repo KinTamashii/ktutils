@@ -1,5 +1,5 @@
 #pragma once
-#include <ktu/memory/writef.hpp>
+#include <ktu/memory/file.hpp>
 #include <ktu/iterator.hpp>
 #include <ktu/ios.hpp>
 #include <ktu/bit.hpp>
@@ -94,7 +94,7 @@ namespace ktu {
                     resize<T, false>(count, value);
                 } else {
                     resize<T, false>(count);
-                    for (T* ptr = (T*)priv.data, endptr = ptr + count; ptr != endptr; ptr++) {
+                    for (T* ptr = (T*)priv.data, *endptr = ptr + count; ptr != endptr; ptr++) {
                         *ptr = value;
                     }
                 }
@@ -503,15 +503,17 @@ namespace ktu {
             inline bool pushf(const std::filesystem::path &path) {
                 return insertf(size(), path);
             }
-            bool insertf(size_type index, const std::filesystem::path &path);
-
-            template <typename T = value_type>
-            inline bool insertf(iterator<typename std::add_const<T>::type> pos) {
-                return insertf(std::distance(cbegin<T>(), pos));
+            bool insertf(size_type index, const std::filesystem::path &path) {
+                return ktu::file::read(*this, index, path);
             }
 
-            inline void writef(const std::filesystem::path &path) {
-                ktu::writef(path, data(), data()+size());
+            template <typename T = value_type>
+            inline bool insertf(iterator<typename std::add_const<T>::type> pos, const std::filesystem::path &path) {
+                return insertf(std::distance(cbegin<T>(), pos), path);
+            }
+
+            inline void write(const std::filesystem::path &path) {
+                ktu::file::write(path, data(), data()+size());
             };
 
             bool operator==(const buffer &other) const;

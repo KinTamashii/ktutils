@@ -1,6 +1,6 @@
 #pragma once
 #include <ktu/ios.hpp>
-#include <ktu/memory/writef.hpp>
+#include <ktu/memory/file.hpp>
 #include <ktu/bit.hpp>
 #include <ktu/iterator.hpp>
 #include <ktu/template.hpp>
@@ -11,6 +11,8 @@
 #include <experimental/functional>
 #include <ktu/array.hpp>
 #include <ktu/memory/view.hpp>
+#include <ktu/unicode.hpp>
+#include <optional>
 namespace ktu {
     class buffer;
 
@@ -290,34 +292,56 @@ inline std::string readString(const char *&ptr) {
             inline T read_big_endian(bool condition) {
                 return ktu::read_big_endian<T>(ptr, condition);
             }
+            inline uint32_t read_u8() {
+                return ktu::u8::read(&ptr);
+            }
+            template <bool big_endian>
+            inline uint32_t read_u16() {
+                return ktu::u16::read<big_endian>(&ptr);
+            }
+            template <bool big_endian>
+            inline uint32_t read_u32() {
+                return ktu::u32::read<big_endian>(&ptr);
+            }
 
             template <typename T = value_type>
-            inline T sread() {
-                return (valid<T>()) ? read<T>() : T();
+            inline std::optional<T> sread() {
+                return (valid<T>()) ? std::optional<T>(read<T>()) : std::optional<T>();
             }
             template <typename T = value_type>
-            inline T sread_little_endian() {
-                return (valid<T>()) ? ktu::read_little_endian<T>(ptr) : T();
+            inline std::optional<T> sread_little_endian() {
+                return (valid<T>()) ? std::optional<T>(ktu::read_little_endian<T>(ptr)) : std::optional<T>();
             }
             template <bool condition = true, typename T = value_type>
-            inline T sread_little_endian() {
-                return (valid<T>()) ? ktu::read_little_endian<condition, T>(ptr) : T();
+            inline std::optional<T> sread_little_endian() {
+                return (valid<T>()) ? std::optional<T>(ktu::read_little_endian<condition, T>(ptr)) : std::optional<T>();
             }
             template <typename T = value_type>
-            inline T sread_little_endian(bool condition) {
-                return (valid<T>()) ? ktu::read_little_endian<T>(ptr, condition) : T();
+            inline std::optional<T> sread_little_endian(bool condition) {
+                return (valid<T>()) ? std::optional<T>(ktu::read_little_endian<T>(ptr, condition)) : std::optional<T>();
             }
             template <typename T = value_type>
-            inline T sread_big_endian() {
-                return (valid<T>()) ? ktu::read_big_endian<T>(ptr) : T();
+            inline std::optional<T> sread_big_endian() {
+                return (valid<T>()) ? std::optional<T>(ktu::read_big_endian<T>(ptr)) : std::optional<T>();
             }
             template <bool condition = true, typename T = value_type>
-            inline T sread_big_endian() {
-                return (valid<T>()) ? ktu::read_big_endian<condition, T>(ptr) : T();
+            inline std::optional<T> sread_big_endian() {
+                return (valid<T>()) ? std::optional<T>(ktu::read_big_endian<condition, T>(ptr)) : std::optional<T>();
             }
             template <typename T = value_type>
-            inline T sread_big_endian(bool condition) {
-                return (valid<T>()) ? ktu::read_big_endian<T>(ptr, condition) : T();
+            inline std::optional<T> sread_big_endian(bool condition) {
+                return (valid<T>()) ? std::optional<T>(ktu::read_big_endian<T>(ptr, condition)) : std::optional<T>();
+            }
+            inline std::optional<uint32_t> sread_u8() {
+                return (valid<uint8_t>()) ? std::optional<uint32_t>(read_u8()) : std::optional<uint32_t>();
+            }
+            template <bool big_endian>
+            inline std::optional<uint32_t> sread_u16() {
+                return (valid<uint16_t>()) ? std::optional<uint32_t>(read_u16<big_endian>()) : std::optional<uint32_t>();
+            }
+            template <bool big_endian>
+            inline std::optional<uint32_t> sread_u32() {
+                return (valid<uint32_t>()) ? std::optional<uint32_t>(read_u32<big_endian>()) : std::optional<uint32_t>();
             }
 
             template <typename T = value_type>
@@ -353,31 +377,57 @@ inline std::string readString(const char *&ptr) {
             inline T peek_big_endian(bool bigEndian) const {
                 return ktu::peek_big_endian<T>(ptr, bigEndian);
             }
+            inline uint32_t peek_u8() {
+                return ktu::u8::read(ptr);
+            }
+            template <bool big_endian>
+            inline uint32_t peek_u16() {
+                return ktu::u16::read<big_endian>(ptr);
+            }
+            template <bool big_endian>
+            inline uint32_t peek_u32() {
+                return ktu::u32::read<big_endian>(ptr);
+            }
+            inline std::optional<uint32_t> speek_u8() {
+                return (valid<uint8_t>()) ? std::optional<uint32_t>(peek_u8()) : std::optional<uint32_t>();
+            }
+            template <bool big_endian>
+            inline std::optional<uint32_t> speek_u16() {
+                return (valid<uint16_t>()) ? std::optional<uint32_t>(peek_u16<big_endian>()) : std::optional<uint32_t>();
+            }
+            template <bool big_endian>
+            inline std::optional<uint32_t> speek_u32() {
+                return (valid<uint32_t>()) ? std::optional<uint32_t>(peek_u32<big_endian>()) : std::optional<uint32_t>();
+            }
 
             template <typename T = value_type>
-            inline T speek_little_endian() const {
-                return (valid<T>()) ? peek_little_endian<T>() : T();
+            inline std::optional<T> speek_little_endian() const {
+                return (valid<T>()) ? std::optional<T>(peek_little_endian<T>()) : std::optional<T>();
             }
             template <bool little_endian, typename T = value_type>
-            inline T speek_little_endian() const {
-                return (valid<T>()) ? peek_little_endian<little_endian, T>() : T();
+            inline std::optional<T> speek_little_endian() const {
+                return (valid<T>()) ? std::optional<T>(peek_little_endian<little_endian, T>()) : std::optional<T>();
             }
             template <typename T = value_type>
-            inline T speek_little_endian(bool littleEndian) const {
-                return (valid<T>()) ? peek_little_endian<T>(littleEndian) : T();
+            inline std::optional<T> speek_little_endian(bool littleEndian) const {
+                return (valid<T>()) ? std::optional<T>(peek_little_endian<T>(littleEndian)) : std::optional<T>();
             }
             template <typename T = value_type>
-            inline T speek_big_endian() const {
-                return (valid<T>()) ? peek_big_endian<T>() : T();
+            inline std::optional<T> speek_big_endian() const {
+                return (valid<T>()) ? std::optional<T>(peek_big_endian<T>()) : std::optional<T>();
             }
             template <bool big_endian, typename T = value_type>
-            inline T speek_big_endian() const {
-                return (valid<T>()) ? peek_big_endian<big_endian, T>() : T();
+            inline std::optional<T> speek_big_endian() const {
+                return (valid<T>()) ? std::optional<T>(peek_big_endian<big_endian, T>()) : std::optional<T>();
             }
             template <typename T = value_type>
-            inline T speek_big_endian(bool bigEndian) const {
-                return (valid<T>()) ? peek_big_endian<T>(bigEndian) : T();
+            inline std::optional<T> speek_big_endian(bool bigEndian) const {
+                return (valid<T>()) ? std::optional<T>(peek_big_endian<T>(bigEndian)) : std::optional<T>();
             }
+
+
+
+
             template <typename T = value_type>
             inline void seek(size_type pos = 1) {
                 ptr = (pointer)(begin<T>() + pos);
@@ -439,20 +489,20 @@ inline std::string readString(const char *&ptr) {
                 return reader(first, last);
             }
 
-            inline void writef(const std::filesystem::path &path) {
-                view.writef(path);
+            inline void write(const std::filesystem::path &path) {
+                view.write(path);
             }
 
-            inline void writef(const std::filesystem::path &path, size_type size) {
-                view.writef(path, size);
+            inline void write(const std::filesystem::path &path, size_type size) {
+                view.write(path, size);
             }
             template <typename T>
-            inline void writef(const std::filesystem::path &path, const T* position, size_type size) {
-                view.writef(path, position, size);
+            inline void write(const std::filesystem::path &path, const T* position, size_type size) {
+                view.write(path, position, size);
             }
             template <typename T>
-            inline void writef(const std::filesystem::path &path, const T* first, const T* last) {
-                view.writef(path, first, last);
+            inline void write(const std::filesystem::path &path, const T* first, const T* last) {
+                view.write(path, first, last);
             }
 
             inline const reader &operator=(const reader &r) {

@@ -28,31 +28,6 @@ void ktu::buffer::assign(void *ptr, size_type count) {
     memcpy(priv.data, ptr, count);
 }
 
-// bool ktu::buffer::pushf(const std::filesystem::path &path) {
-//     if (!std::filesystem::exists(path)) return false;
-//     std::ifstream f(path, ::std::ios::in | ::std::ios::binary);
-
-//     const auto size = std::filesystem::file_size(path);
-//     size_t curSize = size();
-//     resize(curSize+size);
-//     f.read(data<char>()+curSize, size);
-//     return true;
-// }
-
-
-
-bool ktu::buffer::insertf(size_type index, const std::filesystem::path &path) {
-    if (!std::filesystem::exists(path)) return false;
-    std::ifstream f(path, ::std::ios::in | ::std::ios::binary);
-
-    char buffer [256 * 1024];
-    f.rdbuf()->pubsetbuf(buffer, sizeof(buffer));
-
-    const auto size = std::filesystem::file_size(path);
-    resize(this->size()+size);
-    f.read(data<char>()+index, size);
-    return true;
-}
 
 bool ktu::buffer::assign(const std::filesystem::path &path) {
     if (!std::filesystem::exists(path)) return false;

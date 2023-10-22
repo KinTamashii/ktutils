@@ -119,4 +119,20 @@ namespace ktu {
             constexpr inline InputIt begin() {return first;}
             constexpr inline InputIt end() {return last;}
     };
+    template <class T>
+    class reverse_iteration_type : T {
+        private:
+            using cast_type = T*;
+        public:
+            reverse_iteration_type (T &other): T (other) {}
+            inline auto begin()         {return ((cast_type)this)->rbegin();}
+            inline auto end()           {return ((cast_type)this)->rend();}
+            inline auto rbegin()        {return ((cast_type)this)->begin();}
+            inline auto rend()          {return ((cast_type)this)->end();}
+
+            inline auto begin()   const {return ((cast_type)this)->rbegin();}
+            inline auto end()     const {return ((cast_type)this)->rend();}
+            inline auto rbegin()  const {return ((cast_type)this)->begin();}
+            inline auto rend()    const {return ((cast_type)this)->end();}
+    };
 };

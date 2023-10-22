@@ -22,19 +22,42 @@
 
 #include <experimental/functional>
 int main() {
-    ktu::buffer buffer("/Users/kin_tamashii/Desktop/c++/projects/in-progress/ktutils/test/main.cpp");
 
-    ktu::reader reader(buffer);
+    // std::string str = "fuck";
 
-    auto string = ktu::array_null_range("define");
+
+    // std::cout << ktu::file::read(str, 2, "/Users/kin_tamashii/Desktop/c++/projects/released/ktutils/test/main.cpp") << '\n';
+    // std::cout << str << '\n';
+
+
+    ktu::buffer buffer;
+
+
+    //ktu::file::read(buffer, 0, "/Users/kin_tamashii/Desktop/c++/projects/released/ktutils/test/main.cpp");
+
+    buffer.insertf(buffer.end(), "/Users/kin_tamashii/Desktop/c++/projects/released/ktutils/test/main.cpp");
+
 
     
-    reader.find<[](int _c){return isalpha(_c) || _c == '_';}>();
+
+    std::cout <<
+        //ktu::buf_io::fmt << ktu::buf_io::hex <<
+        buffer << '\n';
+
+
+    // ktu::buffer buffer("/Users/kin_tamashii/Desktop/c++/projects/in-progress/ktutils/test/main.cpp");
+
+    // ktu::reader reader(buffer);
+
+    // auto string = ktu::array_null_range("define");
+
     
-    //reader.seek(reader.cur()+100);
-    // reader.skip(100);
-    // reader.find('\'');
-    std::cout << std::string(reader.cur<char>(), 10) << '\n';
+    // reader.find<[](int _c){return isalpha(_c) || _c == '_';}>();
+    
+    // //reader.seek(reader.cur()+100);
+    // // reader.skip(100);
+    // // reader.find('\'');
+    // std::cout << std::string(reader.cur<char>(), 10) << '\n';
     
 
     //std::cout << isalpha('_') << '\n';

@@ -1,6 +1,6 @@
 #pragma once
 #include <ktu/ios.hpp>
-#include <ktu/memory/writef.hpp>
+#include <ktu/memory/file.hpp>
 #include <ktu/bit.hpp>
 #include <ktu/iterator.hpp>
 #include <ktu/template.hpp>
@@ -111,20 +111,20 @@ namespace ktu {
                 return view(first, last);
             }
 
-            inline void writef(const std::filesystem::path &path) {
-                ktu::writef(path, begin(), end());
+            inline void write(const std::filesystem::path &path) {
+                ktu::file::write(path, begin(), end());
             }
 
-            inline void writef(const std::filesystem::path &path, size_type size) {
-                ktu::writef(path, begin(), begin()+size);
+            inline void write(const std::filesystem::path &path, size_type size) {
+                ktu::file::write(path, begin(), begin()+size);
             }
             template <typename T>
-            inline void writef(const std::filesystem::path &path, const T* position, size_type size) {
-                ktu::writef(path, (const char*)position, (const char*)(position+size));
+            inline void write(const std::filesystem::path &path, const T* position, size_type size) {
+                ktu::file::write(path, (const char*)position, (const char*)(position+size));
             }
             template <typename T>
-            inline void writef(const std::filesystem::path &path, const T* first, const T* last) {
-                ktu::writef(path, (const char*)first, (const char*)last);
+            inline void write(const std::filesystem::path &path, const T* first, const T* last) {
+                ktu::file::write(path, (const char*)first, (const char*)last);
             }
 
             inline const view &operator=(const view &r) {
