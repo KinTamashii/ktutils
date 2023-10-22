@@ -4,6 +4,7 @@
 #include <string>
 #include <string_view>
 #include <vector>
+#include <ktu/memory/file.hpp>
 
 namespace ktu {
 template <
@@ -918,6 +919,7 @@ template <
             void cumulative_clear() {
                 priv.string.clear();
             }
+            
         /*`Substring operations`*/
             /*`clear`*/
                 void substring_clear(size_type pos) {
@@ -1287,10 +1289,26 @@ template <
                 template <typename ...Types>
                 void substring_resize(const_reverse_iterator pos, Types&&...args) {substring_resize(pos.base(), args...);}
                 void substring_resize(const_iterator pos, size_type n) {
-                    substring_insert(pos, pos.priv.data->size, n, '\0');
+                    substring_resize(pos, n, '\0');
                 }
                 void substring_resize(const_iterator pos, size_type n, char_type ch) {
-                    substring_insert(pos, pos.priv.data->size, n, ch);
+                    if (n == pos.priv.data->size)
+                        return;
+                    if (n < pos.priv.data->size) {
+                        substring_erase(pos, pos.priv.data->size-n);
+                    } else {
+                        substring_insert(pos, pos.priv.data->size, n - pos.priv.data->size, ch);
+                    }
+                    if constexpr (sizeof(char_type)==1) {
+                        memset(priv.string.data()+pos.priv.data->index, ch, pos.priv.data->size);
+                    } else {
+                        for (size_t i = pos.priv.data->index, i_end = pos.priv.data->index+pos.priv.data->size; i < i_end; ++i) {
+                            priv.string[i] = ch;
+                        }
+                    }
+                    pos.priv.data->size = n;
+                    
+                    // substring_insert(pos, pos.priv.data->size - n, n, ch);
                 }
                 
         /*Building Substring operations*/
@@ -1806,19 +1824,34 @@ template <
                 }
                 size_type building_find_last_not_of(char_type c, size_type pos = 0) const noexcept {
                     return priv.string.find_last_not_of(c, priv.buildingIndex + pos);
-                }
+                }        
 
+    /*`Read`*/
+    bool pushf(file::info info) {
+        priv.string.resize(cumulative_size()+info.size());
+        info.read(building_data());
+        push_building();
+    }
+    bool insertf(size_type pos, file::info info) {return insertf(begin()+pos, info).success;}
+    file::result_type<const_reverse_iterator> insertf(const_reverse_iterator pos, file::info info) {
+        auto resultType = insertf(pos.base(), info);
+        return file::result_type<const_reverse_iterator>{.result=resultType.result.reverse(), .success=resultType.success};
+    }
+    file::result_type<const_iterator> insertf(const_iterator pos, file::info info) {
+        if (!info.exists()) {
+            return file::result_type<const_iterator>{.result=pos,.success=false};
+        }
         
-        
-
-    
-    
-        
-
-
-    
-
+        size_t iteratorIndex = pos-begin();
+        priv.nodes.insert(priv.nodes.begin()+(iteratorIndex), node_type{pos.priv.data->index, 0});
+        file::result_type<const_iterator> resultValue{.result=begin()+iteratorIndex, .success=true};
+        substring_resize(resultValue.result, info.size());
+        info.read((void*)substring_view(resultValue.result).data());
+        return resultValue;
+    }
 };
+
+
 using multi_string = basic_multi_string<char>;
 using wmulti_string = basic_multi_string<wchar_t>;
 using u8multi_string = basic_multi_string<char8_t>;

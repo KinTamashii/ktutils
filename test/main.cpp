@@ -6,6 +6,7 @@
 #include <ktu/algorithm.hpp>
 #include <iostream>
 #include <sstream>
+#include <ktu/multi_string.hpp>
 
 #include <array>
 
@@ -22,6 +23,10 @@
 
 #include <experimental/functional>
 int main() {
+
+    ktu::multi_string MS;
+
+    //ktu::file::read(MS, "/Users/kin_tamashii/Desktop/c++/projects/released/ktutils/test/main.cpp");
 
     // std::string str = "fuck";
 

@@ -508,8 +508,12 @@ namespace ktu {
             }
 
             template <typename T = value_type>
-            inline bool insertf(iterator<typename std::add_const<T>::type> pos, const std::filesystem::path &path) {
-                return insertf(std::distance(cbegin<T>(), pos), path);
+            inline file::result_type<iterator<typename std::add_const<T>::type>> insertf(iterator<typename std::add_const<T>::type> pos, const std::filesystem::path &path) {
+                file::result_type<iterator<typename std::add_const<T>::type>> resultType{.result=pos};
+                size_type iteratorIndex = std::distance(cbegin<T>(), pos);
+                resultType.success = insertf(iteratorIndex, path);
+                resultType.result = cbegin<T>()+iteratorIndex;
+                return resultType;
             }
 
             inline void write(const std::filesystem::path &path) {
